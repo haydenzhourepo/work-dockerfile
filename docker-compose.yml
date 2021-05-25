@@ -76,3 +76,46 @@ services:
       - "${ZOOKEEPER_PORT}:2181"
     networks:
       - backend
+
+  ### Kafka #########################################
+  kafka:
+    build:
+      context: ./kafka
+    volumes:
+      - ${DATA_PATH_HOST}/data/kafka-logs:/data/kafka-logs
+      - ${DATA_PATH_HOST}/data/zookeeper:/data/zookeeper
+    #hostname: kafka
+    ports:
+      - 9092:9092
+    depends_on: 
+      - zookeeper
+    networks:
+      - backend
+
+  ### kafdrop #########################################
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    ports:
+      - 9001:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:19092
+    depends_on:
+      - kafka
+    networks: 
+      - backend
+
+  ### ClickHouse #########################################
+  clickhouse:
+    build: 
+      context: ./clickhouse
+      args:
+        - CLICKHOUSE_VERSION=${CLICKHOUSE_VERSION}
+    volumes:
+      - ${DATA_PATH_HOST}/clickhouse/data:/var/lib/clickhouse
+      - ${CLICKHOUSE_USERS_CUSTOM_CONFIG}:/etc/clickhouse-server/users.xml
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT}:8123"
+      - "${CLICKHOUSE_CLIENT_PORT}:9000"
+      - "${CLICKHOUSE_NATIVE_PORT}:9009"
+    networks:
+      - backend
