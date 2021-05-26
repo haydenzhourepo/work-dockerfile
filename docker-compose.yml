@@ -84,7 +84,7 @@ services:
     volumes:
       - ${DATA_PATH_HOST}/data/kafka-logs:/data/kafka-logs
       - ${DATA_PATH_HOST}/data/zookeeper:/data/zookeeper
-    #hostname: kafka
+    hostname: kafka
     ports:
       - 9092:9092
     depends_on: 
@@ -99,6 +99,7 @@ services:
       - 9001:9000
     environment:
       KAFKA_BROKERCONNECT: kafka:19092
+      SCHEMAREGISTRY_AUTH: hayden:15007116
     depends_on:
       - kafka
     networks: 
@@ -117,5 +118,21 @@ services:
       - "${CLICKHOUSE_HTTP_PORT}:8123"
       - "${CLICKHOUSE_CLIENT_PORT}:9000"
       - "${CLICKHOUSE_NATIVE_PORT}:9009"
+    networks:
+      - backend
+
+  ### ClickHouse #########################################
+  nginx:
+    build: 
+      context: ./nginx
+      args: 
+      - NGINX_VERSION=${NGINX_VERSION}
+    volumes: 
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/sites:/etc/nginx/sites-available
+      - ./nginx/ssl:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
     networks:
       - backend
