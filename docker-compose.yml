@@ -7,6 +7,7 @@ networks:
 services:
   ### MySQL ################################################
   mysql:
+    platform: linux/x86_64
     build:
       context: ./mysql
       args:
@@ -29,7 +30,7 @@ services:
       - ${DATA_PATH_HOST}/redis:/data
     ports:
       - "${REDIS_PORT}:6379"
-    networks: 
+    networks:
       - backend
 
   ### REDISWEBUI ################################################
@@ -87,7 +88,7 @@ services:
     hostname: kafka
     ports:
       - 9092:9092
-    depends_on: 
+    depends_on:
       - zookeeper
     networks:
       - backend
@@ -102,12 +103,12 @@ services:
       SCHEMAREGISTRY_AUTH: hayden:15007116
     depends_on:
       - kafka
-    networks: 
+    networks:
       - backend
 
   ### ClickHouse #########################################
   clickhouse:
-    build: 
+    build:
       context: ./clickhouse
       args:
         - CLICKHOUSE_VERSION=${CLICKHOUSE_VERSION}
@@ -123,12 +124,13 @@ services:
 
   ### ClickHouse #########################################
   nginx:
-    build: 
+    build:
       context: ./nginx
-      args: 
-      - NGINX_VERSION=${NGINX_VERSION}
-    volumes: 
-      - ./nginx/logs:/var/log/nginx
+      args:
+        - NGINX_VERSION=${NGINX_VERSION}
+    volumes:
+      - ${APP_CODE_PATH_HOST}:/var/www
+      - /logs:/var/log/nginx
       - ./nginx/sites:/etc/nginx/sites-available
       - ./nginx/ssl:/etc/nginx/ssl
     ports:
