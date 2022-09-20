@@ -122,7 +122,7 @@ services:
     networks:
       - backend
 
-  ### ClickHouse #########################################
+  ### NGINX #########################################
   nginx:
     build:
       context: ./nginx
@@ -137,5 +137,40 @@ services:
       - "80:80"
       - "9999:9999"
       - "443:443"
+    networks:
+      - backend
+
+  ### MongoDB ##############################################
+  mongo:
+    build: ./mongo
+    ports:
+      - "${MONGODB_PORT}:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    volumes:
+      - ${DATA_PATH_HOST}/mongo:/data/db
+      - ${DATA_PATH_HOST}/mongo_config:/data/configdb
+    networks:
+      - backend
+
+  ### PolarisMesh ##############################################
+  polarismesh:
+    build: ./polarismesh
+    ports:
+      - "${POLARIS_EUREKA_PORT}:8761"
+      - "${POLARIS_OPEN_API_PORT}:8090"
+      - "${POLARIS_SERVICE_GRPC_PORT}:8091"
+      - "${POLARIS_CONFIG_GRPC_PORT}:8093"
+      - "${POLARIS_PROMETHEUS_SD_PORT}:9000"
+      - "${POLARIS_XDSV3_PORT}:15010"
+      - "${POLARIS_CONSOLE_PORT}:8080"
+      - "${PROMETHEUS_PORT}:9090"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    volumes:
+      - ${DATA_PATH_HOST}/mongo:/data/db
+      - ${DATA_PATH_HOST}/mongo_config:/data/configdb
     networks:
       - backend
