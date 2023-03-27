@@ -7,7 +7,6 @@ networks:
 services:
   ### MySQL ################################################
   mysql:
-    platform: linux/x86_64
     build:
       context: ./mysql
       args:
@@ -174,10 +173,10 @@ services:
       - ${DATA_PATH_HOST}/mongo_config:/data/configdb
     networks:
       - backend
-    
+
   ### ApachePulsar ##############################################
   pulsar:
-    build: 
+    build:
       context: ./pulsar
       args:
         - PULSAR_VERSION=${PULSAR_VERSION}
@@ -187,5 +186,23 @@ services:
     volumes:
       - ${DATA_PATH_HOST}/pulsar/data:/pulsar/data
       # - ${DATA_PATH_HOST}/pulsar/conf:/pulsar/conf
+    networks:
+      - backend
+
+  ### MSSQL ################################################
+  mssql:
+    build:
+      context: ./mssql
+      args:
+        - MSSQL_VERSION=${MSSQL_VERSION}
+    environment:
+      - MSSQL_PID=Express
+      - MSSQL_DATABASE=${MSSQL_DATABASE}
+      - SA_PASSWORD=${MSSQL_PASSWORD}
+      - ACCEPT_EULA=Y
+    volumes:
+      - ${DATA_PATH_HOST}/mssql:/var/opt/mssql
+    ports:
+      - "${MSSQL_PORT}:1433"
     networks:
       - backend
