@@ -221,3 +221,17 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     networks:
       - backend
+
+  ### Jenkins ################################################
+  jenkins:
+    build: 
+      context: ./jenkins
+      args:
+        - JENKINS_VERSION=${JENKINS_VERSION}
+    volumes:
+      - ${DATA_PATH_HOST}/jenkins/jenkins_home:/var/jenkins_home
+    ports:
+      - ${JENKINS_PORT}:8080
+
+
+ 
