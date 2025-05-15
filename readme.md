@@ -7,5 +7,5 @@ change the config in .env file.
 2. start the service you want in the docker-compsose.yml
 example
 ```sh
-docker-compose up -d kafka-ui
+docker-compose up -d kafkaui
 ```
