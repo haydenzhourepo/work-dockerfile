@@ -1,6 +1,11 @@
-1. 服务环境配置
+1. Copy the configuration file
+```
 cp .env.example .env
+```
+change the config in .env file.
 
-2. 修改 .env 中的账号密码
-
-3. docker-compose up -d xxx
+2. start the service you want in the docker-compsose.yml
+example
+```sh
+docker-compose up -d kafka-ui
+```
