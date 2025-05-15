@@ -79,25 +79,37 @@ services:
   kafka:
     build:
       context: ./kafka
+      args:
+        - KAFKA_VERSION=${KAFKA_VERSION}
     volumes:
-      - ${DATA_PATH_HOST}/data/kafka-logs:/data/kafka-logs
-      - ${DATA_PATH_HOST}/data/zookeeper:/data/zookeeper
+      - ${DATA_PATH_HOST}/data/kafka:/bitnami/kafka
     hostname: kafka
+    environment:
+       # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:${KAFKA_PORT},INTERNAL://kafka:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     ports:
-      - 9092:9092
-    depends_on:
-      - zookeeper
+      - ${KAFKA_PORT}:9092
     networks:
       - backend
 
-  ### kafdrop #########################################
-  kafdrop:
-    image: obsidiandynamics/kafdrop
+  ### KAFKAUI #########################################
+  kafkaui:
+    image: provectuslabs/kafka-ui
     ports:
-      - 9001:9000
+      - ${KAFKAUI_PORT}:8080
     environment:
-      KAFKA_BROKERCONNECT: kafka:19092
-      SCHEMAREGISTRY_AUTH: hayden:15007116
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9094
+      AUTH_TYPE: LOGIN_FORM
+      SPRING_SECURITY_USER_NAME: ${KAFKAUI_AUTH_USER}
+      SPRING_SECURITY_USER_PASSWORD: ${KAFKAUI_AUTH_PASS}
     depends_on:
       - kafka
     networks:
