@@ -1,4 +1,5 @@
-FROM mongo:latest
+ARG MONGO_VERSION
+FROM mongo:${MONGO_VERSION}
 
 CMD ["mongod"]
 

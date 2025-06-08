@@ -85,7 +85,7 @@ services:
       - ${DATA_PATH_HOST}/data/kafka:/bitnami/kafka
     hostname: kafka
     environment:
-       # KRaft settings
+      # KRaft settings
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
@@ -151,7 +151,10 @@ services:
 
   ### MongoDB ##############################################
   mongo:
-    build: ./mongo
+    build:
+      context: ./mongo
+      args:
+        - MONGO_VERSION=${MONGO_VERSION}
     ports:
       - "${MONGODB_PORT}:27017"
     environment:
@@ -234,7 +237,7 @@ services:
 
   ### Jenkins ################################################
   jenkins:
-    build: 
+    build:
       context: ./jenkins
       args:
         - JENKINS_VERSION=${JENKINS_VERSION}
@@ -242,7 +245,6 @@ services:
       - ${DATA_PATH_HOST}/jenkins/jenkins_home:/var/jenkins_home
     ports:
       - ${JENKINS_PORT}:8080
-
 
   ### elasticsearch ################################################
   elasticsearch:
@@ -252,7 +254,7 @@ services:
         # - ${DATA_PATH_HOST}/elasticsearch/config:/usr/share/elasticsearch/config
       - ${DATA_PATH_HOST}/elasticsearch/plugins:/usr/share/elasticsearch/log
     environment:
-      - "cluster.name=elasticsearch" 
+      - "cluster.name=elasticsearch"
       - "discovery.type=single-node"
     ports:
       - 9200:9200
@@ -268,7 +270,6 @@ services:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     networks:
       - backend
-
 
   ### HANA ################################################
   hana:
@@ -290,10 +291,10 @@ services:
         soft: 1048576
         hard: 1048576
     # sysctls:
-      # kernel.shmmax: 1073741824
-      # kernel.shmmni: 524288
-      # kernel.shmall: 8388608
-      # net.ipv4.ip_local_port_range: "40000 60999"
+    # kernel.shmmax: 1073741824
+    # kernel.shmmni: 524288
+    # kernel.shmall: 8388608
+    # net.ipv4.ip_local_port_range: "40000 60999"
     volumes:
       - ${DATA_PATH_HOST}/hana/data:/hana/mounts
     command: "--master-password Hayden123 --agree-to-sap-license"
@@ -320,4 +321,16 @@ services:
     ports:
       - "3000:3000"
       - "222:22"
- 
+
+  ### RABBITMQ ################################################
+  rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION}
+    ports:
+      - "${RABBITMQ_LISTEN_PORT}:5672"
+      - "${RABBITMQ_MANAGE_PORT}:15672"
+    volumes:
+      - ${DATA_PATH_HOST}/rabbitmq/data/:/var/lib/rabbitmq/
+      - ${DATA_PATH_HOST}/rabbitmq/log/:/var/log/rabbitmq/
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
