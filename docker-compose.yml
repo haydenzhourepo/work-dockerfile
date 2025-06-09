@@ -334,3 +334,51 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - backend
+
+  ### NACOS ################################################
+  nacos:
+    image: nacos/nacos-server:${NACOS_VERSION}
+    restart: always
+    environment:
+      - MODE=standalone
+      - NACOS_AUTH_IDENTITY_KEY=${NACOS_AUTH_IDENTITY_KEY}
+      - NACOS_AUTH_IDENTITY_VALUE=${NACOS_AUTH_IDENTITY_VALUE}
+      - NACOS_AUTH_TOKEN=${NACOS_AUTH_TOKEN}
+    volumes:
+      - ${DATA_PATH_HOST}/nacos/standalone-logs/:/home/nacos/logs
+    ports:
+      - "${NACOS_ADMIN_PORT}:8080"
+      - "${NACOS_CLIENT_PORT}:8848"
+      - "${NACOS_SERVER_PORT}:9848"
+    networks:
+      - backend
+
+  ### FastDFS ################################################
+  fd-tracker:
+    image: delron/fastdfs
+    restart: always
+    volumes:
+      - "${DATA_PATH_HOST}/fastdfs/tracker_data:/var/fdfs"
+    ports:
+      - "22122:22122"
+    command: "tracker"
+    networks:
+      - backend
+
+  fd-storage:
+    image: delron/fastdfs
+    restart: always
+    volumes:
+      - "${DATA_PATH_HOST}/fastdfs/storage:/var/fdfs"
+    ports:
+      - "23000:23000"
+      - "23080:888"
+    depends_on:
+      - fd-tracker
+    environment:
+      TRACKER_SERVER: "fs-tracker:22122"
+    command: "storage"
+    networks:
+      - backend
