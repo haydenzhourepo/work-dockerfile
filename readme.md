@@ -1,3 +1,27 @@
+## All supported services list
+* mysql
+* redis
+* redis-webui
+* postgres
+* zookeeper
+* kafka
+* kafkaui
+* clickhouse
+* nginx
+* mongo
+* polarismesh
+* pulsar
+* mssql
+* minio
+* jenkins
+* elasticsearch
+* kibana
+* hana
+* gitea
+* rabbitmq
+* nacos
+* FastDFS
+
 1. Copy the configuration file
 ```
 cp .env.example .env
