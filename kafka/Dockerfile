@@ -1,5 +1,6 @@
-ARG KAFKA_VERSION
-FROM bitnami/kafka:${KAFKA_VERSION}
+ARG KAFKA_VERSION=latest
+FROM haydenzhou/kafka:${KAFKA_VERSION}
+
 
 
 
